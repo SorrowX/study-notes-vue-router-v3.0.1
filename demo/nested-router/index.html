@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>nested-router</title>
+</head>
+<body>
+	<div id="app"></div>
+	<script src="../../dist/vue.js"></script>
+	<script src="../../dist/vue-router.js"></script>
+	<script>
+
+		// 1. 定义路由组件
+		let Foo = {
+			created() {
+            	console.log(this.$route)
+            },
+			template: `
+			    <div class="foo">
+			        <h1>foo</h1>
+			    </div>
+			`
+		}
+
+		let Bar = {
+			created() {
+            	console.log(this.$route)
+            },
+			template: `
+			    <div class="bar">
+			        <h1>bar</h1>
+			    </div>
+			`
+		}
+
+		// 组件里面也注入router实例
+		let Nested = {
+            router: new VueRouter({
+            	routes: [
+            	    {
+                        path: '/foo',
+                        component: Foo
+            	    },
+            	    {
+            	    	path: '/bar',
+                        component: Bar
+            	    },
+            	]
+            }),
+            created() {
+            	console.log(this.$route)
+            },
+            template: `
+                <div class="child">
+                    <p> Child router path: {{ $route.fullPath }} </p>
+                    <ul>
+                        <li>
+                            <router-link to="/foo"> nested: /foo </router-link>
+                        </li>
+                        <li>
+                            <router-link to="/bar"> nested: /bar </router-link>
+                        </li>
+                    </ul>
+                    <router-view/>
+                </div>
+            `
+		}
+
+		let res = Vue.compile(`
+			<div id="app">
+			    <p> Root router path: {{ $route.fullPath }} </p>
+			    <ul>
+			        <li>
+                        <router-link to="/nested-router"> /nested-router </router-link>
+			        </li>
+			        <li>
+			            <router-link to="/foo"> /foo </router-link>
+			        </li>
+			        <li>
+			            <router-link to="/bar"> /bar </router-link>
+			        </li>
+			    </ul>
+			    <router-view></router-view>
+			</div>
+		`)
+
+		let router = new VueRouter({
+            routes: [
+                {
+                	path: '/nested-router',
+                	component: Nested
+                },
+                {
+                	path: '/foo',
+                	component: Foo
+                },
+                {
+                	path: '/bar',
+                	component: Bar
+                }
+            ]
+		})
+		console.log(router)
+
+		// 注入路由
+		let vm = new Vue({
+			router,
+            render: res.render,
+            staticRenderFns: res.staticRenderFns
+		}).$mount('#app')
+	</script>
+</body>
+</html>

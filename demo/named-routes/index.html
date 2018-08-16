@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>named-routes</title>
+</head>
+<body>
+	<div id="app"></div>
+	<script src="../../dist/vue.js"></script>
+	<script src="../../dist/vue-router.js"></script>
+	<script>
+		
+		const Home = { template: '<div>This is Home</div>' }
+		const Foo = { template: '<div>This is Foo</div>' }
+		const Bar = { template: '<div>This is Bar {{ $route.params.id }}</div>' }
+
+		let router = new VueRouter({
+			routes: [
+			    {
+			    	name: 'home',
+			    	path: '/',
+			    	component: Home
+			    },
+			    {
+			    	name: 'foo',
+			    	path: '/foo',
+			    	component: Foo
+			    },
+			    {
+			    	name: 'bar',
+			    	path: '/bar/:id',
+			    	component: Bar
+			    }
+			]
+		})
+
+		let res = Vue.compile(`
+            <div id="app">
+                <h3>Named Routes</h3>
+                <p> current route name: {{ $route.name }} </p>
+                <ul>
+                    <li>
+                        <router-link :to="{name: 'home'}"> home </router-link>
+                    </li>
+                    <li>
+                        <router-link :to="{name: 'foo'}"> foo </router-link>
+                    </li>
+                    <li>
+                        <router-link :to="{name: 'bar', params: {id: 123}}"> bar </router-link>
+                    </li>
+                </ul>
+                <router-view class="view"></router-view>
+            </div>
+		`)
+
+		let vm = new Vue({
+			router,
+			render: res.render,
+			staticRenderFns: res.staticRenderFns
+		}).$mount('#app')
+	</script>
+</body>
+</html>

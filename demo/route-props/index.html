@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>route-props</title>
+</head>
+<body>
+	<div id="app"></div>
+	<script src="../../dist/vue.js"></script>
+	<script src="../../dist/vue-router.js"></script>
+	<script>
+
+		// Hello组件
+		let Hello = {
+			props: {
+				name: {
+					type: String,
+					default: 'Vue!'
+				}
+			},
+			template: `
+                <div class="hello">
+                    <h5> Hello {{ name }}</h5>
+                    <p> {{ $props }} </p>
+                    <span>{{ $attrs }}</span>
+                </div>
+			`
+		}
+
+		function dynamicPropsFn(route) {
+			const now = new Date()
+            return {
+            	name: (now.getFullYear() + parseInt(route.params.years)) + '!'
+            }
+		}
+
+		// router 实例
+		let router = new VueRouter({
+            routes: [
+                {
+                	path: '/',
+                	component: Hello // 什么也没有
+                }, 
+                {
+                    path: '/hello/:name',
+                    component: Hello,
+                    props: true    // 传递route.params给props
+                },
+                {
+                	path: '/static',
+                	component: Hello,
+                	props: {
+                		name: 'world',
+                		str: 'static'
+                	} // 传递一个对象给props
+                },
+                {
+                	path: '/dynamic/:years',
+                	component: Hello,
+                	props: dynamicPropsFn // 传递函数
+                },
+                {
+                	path: '/attrs',
+                	component: Hello,
+                	props: {
+                		name: 'attrs'
+                	} // 如果组件有name属性,则更新值,否怎添加该属性
+                }
+            ]
+		})
+
+		// 实例化vm
+		let vm = new Vue({
+			router,
+			template: `
+                <div id="app">
+                    <h3> route props </h3>
+                    <ul>
+                        <li>
+                            <router-link to="/"> / </router-link>
+                        </li>
+                        <li>
+                            <router-link to="/hello/you"> /hello/you </router-link>
+                        </li>
+                        <li>
+                            <router-link to="/static"> /static </router-link>
+                        </li>
+                        <li>
+                            <router-link to="/dynamic/1"> /dynamic/1 </router-link>
+                        </li>
+                        <li>
+                            <router-link to="/attrs"> /attrs </router-link>
+                        </li>
+                    </ul>
+                    <router-view class="view" foo="123"></router-view>
+                </div>
+			`
+		}).$mount('#app')
+	</script>
+</body>
+</html>

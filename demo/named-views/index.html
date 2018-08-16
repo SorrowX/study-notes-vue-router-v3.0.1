@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Named-Views</title>
+</head>
+<body>
+	<div id="app"></div>
+	<script src="../../dist/vue.js"></script>
+	<script src="../../dist/vue-router.js"></script>
+	<script>
+
+		const Foo = { 
+			template: `
+			    <div class="foo">
+			        foo
+			    </div>
+			` 
+		}
+		const Bar = {
+			template: `
+			    <div class="bar">
+			        bar
+			    </div>
+			` 
+		}
+		const Baz = {
+			template: `
+			    <div class="baz">
+			        baz
+			    </div>
+			` 
+		}
+
+		let router = new VueRouter({
+			routes: [
+			    {
+			    	path: '/',
+			    	components: {
+			    		default: Foo,
+			    		a: Bar,
+			    		b: Baz
+			    	}
+			    }, // 单个路由可以定义多个命名组件,将被渲染到对应名称的<router-view>中去
+			    {
+			    	path: '/other',
+			    	components: {
+			    		default: Baz,
+			    		a: Bar,
+			    		b: Foo
+			    	}
+			    }
+			]
+		})
+		
+		let res = Vue.compile(`
+            <div id="app">
+                <h3>Named Views</h3>
+                <ul>
+                    <li>
+                        <router-link to="/"> / </router-link>
+                    </li>
+                    <li>
+                        <router-link to="/other"> /other </router-link>
+                    </li>
+                </ul>
+                <router-view class="view one"></router-view>
+                <router-view class="view two" name="a"></router-view>
+                <router-view class="view three" name="b"></router-view>
+            </div>
+		`)
+
+		let vm = new Vue({
+			router,
+			render: res.render,
+			staticRenderFns: res.staticRenderFns
+		}).$mount('#app')
+	</script>
+</body>
+</html>
