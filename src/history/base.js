@@ -113,7 +113,7 @@ export class History {
         } = resolveQueue(this.current.matched, route.matched)
 
         const queue: Array<?NavigationGuard> = [].concat(
-            // in-component leave guards
+            // in-component leave guards 在失活的组件里调用离开守卫
             extractLeaveGuards(deactivated),
             // global before hooks
             this.router.beforeHooks,
