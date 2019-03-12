@@ -28,7 +28,7 @@
     		    // 因为当守卫执行前，组件实例还没被创建
     		    console.log('Foo beforeRouteEnter')
                 next((vm) => {
-                    console.log(vm)
+                    console.log('拿到实例')
                 })
     		},
     		beforeRouteUpdate (to, from, next) {
@@ -45,7 +45,12 @@
     		    console.log('Foo beforeRouteLeave')
                 next()
     		},
-    		template: '<div>foo</div>' 
+    		template: `
+                <div class="foo">
+                    <p>foo</p>
+                    <router-view></router-view>
+                </div>
+            ` 
     	}
 
     	const Bar = {
@@ -71,9 +76,8 @@
                 next()
     		},
     		template: `
-    		    <div>
-    		        bar
-    		        <router-link></router-link>
+    		    <div class="bar">
+    		        <p>bar</p>
     		    </div>
     		` 
     	}
@@ -89,10 +93,11 @@
 				    },
 			    	children: [
 			    	    {
-			    	    	path: '/bar',
+			    	    	path: 'bar',
 			    	    	component: Bar,
 			    	    	beforeEnter: (to, from, next) => {
 						        console.log('/bar 子路由独享')
+                                next()
 						    }
 			    	    }
 			    	]
@@ -104,6 +109,10 @@
 		    console.log('beforeEach 钩子')
 		    next()
 		})
+        router.beforeResolve((to, from, next) => {
+            console.log('beforeResolve 钩子')
+            next()
+        })
     	router.afterEach((to, from) => {
     	    console.log('afterEach 钩子')
     	})

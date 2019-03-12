@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>scroll-behavior</title>
+	<style>
+		
+	</style>
+</head>
+<body>
+	<div id="app"></div>
+	<script src="../../dist/vue.js"></script>
+	<script src="../../dist/vue-router.js"></script>
+	<script>
+
+		const scrollBehavior = function (to, from, savedPosition) {
+			if (savedPosition) {
+			    // savedPosition is only available for popstate navigations.
+			    return savedPosition
+			} else {
+			    const position = {}
+
+			    // scroll to anchor by returning the selector
+			    if (to.hash) {
+				    position.selector = to.hash
+
+				    // specify offset of the element
+				    if (to.hash === '#anchor2') {
+				        position.offset = { y: 100 }
+				    }
+
+				    if (document.querySelector(to.hash)) {
+				        return position
+				    }
+
+				    // if the returned position is falsy or an empty object,
+				    // will retain current scroll position.
+				    return false
+			    }
+
+			    return new Promise(resolve => {
+			        // check if any matched route config has meta that requires scrolling to top
+			        if (to.matched.some(m => m.meta.scrollToTop)) {
+				        // coords will be used if no selector is provided,
+				        // or if the selector didn't match any element.
+				        position.x = 0
+				        position.y = 0
+			        }
+
+			        // wait for the out transition to complete (if necessary)
+			        this.app.$root.$once('triggerScroll', () => {
+			            // if the resolved position is falsy or an empty object,
+			            // will retain current scroll position.
+			            resolve(position)
+			        })
+			    })
+			}
+		}
+
+		const router = new VueRouter({
+			scrollBehavior,
+			routes: [
+			    { path: '/', component: Home},
+			    { path: '/foo', component: Foo, meta: { scrollToTop: true } },
+			    { path: '/bar', component: Bar, meta: { scrollToTop: true }}
+			]
+		})
+
+        new Vue({
+	        router,
+	        template: `
+	            <div id="app">
+		            <h1>Scroll Behavior</h1>
+		            <ul>
+		                <li><router-link to="/">/</router-link></li>
+		                <li><router-link to="/foo">/foo</router-link></li>
+		                <li><router-link to="/bar">/bar</router-link></li>
+		            </ul>
+		            <transition name="fade" @after-leave="afterLeave">
+		                <router-view class="view"></router-view>
+		            </transition>
+	            </div>
+	        `,
+	        methods: {
+	            afterLeave () {
+	                this.$root.$emit('triggerScroll')
+	            }
+	        }
+        }).$mount('#app')
+	</script>
+</body>
+</html>
