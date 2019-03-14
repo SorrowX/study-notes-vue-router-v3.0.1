@@ -119,7 +119,12 @@
 
 
     	new Vue({
-    		router
+    		router,
+            methods: {
+                handlerClick() {
+                    console.log('handlerClick')
+                }
+            }
     	}).$mount('#app')
     </script>
 </body>
